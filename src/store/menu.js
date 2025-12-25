@@ -24,13 +24,7 @@ const mutations = {
         state.selectMenu.splice(index, 1)
     },
     dynamicMenu (state, payload) {
-        //console.log(payload);
-        
-        //const routerList = payload?.menu?.routerList || []
         const routerList = payload.menu.routerList
-        //console.log(routerList);
-        
-        
         
         // 通过glob导入文件
         const modules = import.meta.glob('../views/**/**/*.vue')
