@@ -113,7 +113,7 @@
         <el-card style="max-width: 480px;">
             <template #header>
                 <div class="card-header">
-                    <img src="/login-head.png" alt="">
+                    <img src="/login.png" alt="">
                 </div>
             </template>
             <div class="jump-link">
@@ -145,9 +145,16 @@
 
     :deep(.el-card__header) {
         padding: 0;
-    }
+    } 
+    
     .login-container {
         height: 100%;
+
+        background-image: url('/login_back.png'); 
+        background-size: 100% 50%;                   // 保持图片比例覆盖整个容器
+        background-position: top center;              // 图片居中
+        background-repeat: no-repeat;     
+
         .card-header {
             background-color: #899fe1;
             img {
