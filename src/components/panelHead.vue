@@ -21,6 +21,11 @@
         background: #e8edf0;
         background-color: #e8edf0;
         position: relative;
+        border-radius: 8px; 
+        margin-bottom: 10px; 
+
+
+
         .panel-lead {
             font-size: 14px;
             .title {

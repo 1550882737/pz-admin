@@ -11,6 +11,8 @@
     const router = useRouter()
 
     const userInfo = JSON.parse(localStorage.getItem('pzv2_userInfo'))
+
+    const localAvatar = '/gxmzu_avatar.png';
     
     // 点击关闭tag
     const closeTab = (item, index) => {
@@ -74,7 +76,7 @@
             <el-dropdown @command="handleClick">
                 <div class="el-dropdown-link flex-box">
                      <el-avatar
-                        :src="userInfo.avatar"
+                        :src="localAvatar"
                     />
                     <p class="user-name">{{ userInfo.name }}</p>
                 </div>

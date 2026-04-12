@@ -52,7 +52,7 @@
             text-align: center;
             height: 50px;
             line-height: 50px;
-            color: #409EFF;
+            color: #303133;
         }
     }
 </style>
