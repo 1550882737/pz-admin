@@ -3,6 +3,7 @@
     import { useRouter } from 'vue-router';
     import { reactive, computed} from 'vue';
     import { useStore } from 'vuex'
+    import { Monitor } from '@element-plus/icons-vue'
 
 
     const router = useRouter()
@@ -22,16 +23,22 @@
 <template>
     <el-menu
         :style="{width: !isCollapse ? '230px': '64px' }"
-        active-text-color="#ffd04b"
-        background-color="#545c64"
+        active-text-color="#409EFF"
+        background-color="#ffffff"
         class="aside-container"
-        text-color="#fff"
+        text-color="#303133"
         @open="handleOpen"
         @close="handleClose"
         :collapse="isCollapse"
         :default-active="active"
       >
-        <p class="logo-lg">{{ isCollapse ? 'YUA' : 'YUA陪诊' }}</p>
+        <p class="logo-lg">
+            <el-icon :size="24" style="vertical-align: middle; margin-right: 5px;">
+                <Monitor />
+            </el-icon>
+
+           <span v-if="!isCollapse" class="logo-text">智慧陪诊</span>
+        </p>
         <TreeMenu :index="1" :menuData="menuData" />
       </el-menu>
 
@@ -45,7 +52,7 @@
             text-align: center;
             height: 50px;
             line-height: 50px;
-            color: #fff;
+            color: #409EFF;
         }
     }
 </style>
