@@ -1,6 +1,6 @@
 <script setup>
     import { ref, reactive, onMounted, nextTick} from 'vue';
-    import { menuList, userGetMenu, userSetMenu } from '../../../api';
+    import { menuList, userGetMenu, userSetMenu, deleteMenu} from '../../../api';
     import { Plus } from '@element-plus/icons-vue';
     import { useRoute } from 'vue-router';
 
@@ -34,6 +34,21 @@
                 }, 100)
             }
         })
+    }
+
+    const handleDelete = (row) => {
+        ElMessageBox.confirm(
+            `确定删除权限组「${row.name}」吗？`,
+            '提示',
+            {
+                type: 'warning'
+            }
+        ).then(async () => {
+            await deleteMenu({ id: row.id })
+
+            ElMessage.success('删除成功')
+            getListData()
+        }).catch(() => {})
     }
 
     const menuListData = reactive({
@@ -91,19 +106,23 @@
     })
 
     // 表单提交
-    const confirm = async(formEl) => {
+    const confirm = async (formEl) => {
         if (!formEl) return
-        await formEl.validate((valid, fields) => {
+
+        await formEl.validate(async (valid) => {
             if (valid) {
                 const permissions = JSON.stringify(treeRef.value.getCheckedKeys())
-                userSetMenu({ name: form.name, permissions}).then(({ data }) => {
-                    //console.log(data)
-                    beforeClose()
-                    getListData()
-                })
-            }
-            else {
-                console.log('error submit!', fields)
+
+                const params = {
+                    id: form.id, // 👈 关键
+                    name: form.name,
+                    permissions
+                }
+
+                await userSetMenu(params)
+
+                beforeClose()
+                getListData()
             }
         })
     }
@@ -122,6 +141,12 @@
         <el-table-column label="操作">
             <template #default="scope">
                 <el-button type="primary" @click="open(scope.row)">编辑</el-button>
+                <el-button 
+                    type="danger" 
+                    @click="handleDelete(scope.row)"
+                >
+                    删除
+                </el-button>
             </template>
         </el-table-column>
     </el-table>

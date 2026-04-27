@@ -53,6 +53,7 @@
                 updateUser({ mobile, name, permissions_id }).then(({ data }) => {
                     if (data.code === 10000) {
                         dialogFormVisable.value = false
+                        console.log(data)
                         getListData()
                     }
                 })
@@ -102,8 +103,18 @@
     })
 
     const open = (rowData) => {
+        console.log("编辑行数据:", rowData)
         dialogFormVisable.value = true
-        Object.assign(form, {mobile: rowData.mobile, name: rowData.name, permissions_id: rowData.permissions_id })
+        
+        // 注意：这里要使用实际的字段名
+        Object.assign(form, {
+            mobile: rowData.mobile, 
+            name: rowData.name, 
+            // 这里使用 Permissions_id 字段，而不是 permissions_id
+            permissions_id: rowData.Permissions_id || rowData.permissions_id
+        })
+        
+        console.log("表单数据:", form)
     }
 </script>
 

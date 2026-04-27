@@ -26,6 +26,11 @@ export const userSetMenu = (data) => {
     return request.post('/user/setmenu', data)
 }
 
+// 删除权限组
+export const deleteMenu = (params) => {
+    return request.post('/user/deletemenu', params)
+}
+
 // 菜单权限列表
 export const menuList = (params) => {
     return request.get('/menu/list', { params })
@@ -55,6 +60,11 @@ export const photoList = () => {
 // 陪护师创建
 export const companion = (data) => {
     return request.post('/companion', data)
+}
+
+// 陪护师头像上传
+export const uploadApi  = (data) => {
+    return request.post('/upload', data)
 }
 
 // 陪护师列表

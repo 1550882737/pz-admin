@@ -1,7 +1,7 @@
 <script setup>
     import { reactive, ref, onMounted, nextTick } from 'vue'
     import { InfoFilled, Plus, Delete } from '@element-plus/icons-vue';
-    import { photoList, companion, companionList, deleteCompanion } from '../../../api'
+    import { photoList, companion, companionList, deleteCompanion, uploadApi} from '../../../api'
     import { useRoute } from 'vue-router';
 
     const route = useRoute()
@@ -32,6 +32,27 @@
     const dialogImgVisable = ref(false)
     const filelist = ref([])
     const selectIndex = ref(0)
+
+    const uploadAvatar = async (options) => {
+        const file = options.file
+
+        const formData = new FormData()
+        formData.append('file', file)
+
+        try {
+            const { data } = await uploadApi(formData)
+
+            if (data.code === 10000) {
+                form.avatar = data.data.url
+                ElMessage.success('上传成功')
+            } else {
+                ElMessage.error(data.message)
+            }
+        } catch (error) {
+            console.error(error)
+            ElMessage.error('上传失败')
+        }
+    }
     const confirmImage = () => {
         form.avatar = filelist.value[selectIndex.value].url
         dialogImgVisable.value = false
@@ -68,34 +89,52 @@
         mobile: [{ required: true, trigger: 'blur', message: '请填写手机号'}],
     })
 
-    // 确认陪护师添加
+    // 确认陪护师添加/编辑
     const confirm = async(formEl) => {
         if (!formEl) return
         await formEl.validate((valid, fields) => {
             if (valid) {
                 companion(form).then(({ data }) => {
                     if (data.code === 10000) {
-                        ElMessage.success('成功')
+                        const message = form.id ? '编辑成功' : '新增成功';
+                        ElMessage.success(message)
                         beforeClose()
                         getListData()
                     }
                     else {
                         ElMessage.error(data.message)
                     }
+                }).catch(error => {
+                    console.error('操作失败:', error);
+                    ElMessage.error('操作失败，请稍后重试')
                 })
             }
             else {
-                console.log('error submit!', fields)
+                console.log('验证失败!', fields)
             }
         })
     }
 
-    const open = (rowData={}) => {
+    const open = (rowData) => {
         dialogFormVisable.value = true
         nextTick(() => {
-            // 如果是编辑
-            if (rowData) {
+            // 重置表单
+            formRef.value.resetFields();
+            
+            // 如果是编辑，将数据填入表单
+            if (rowData && rowData.id) {
                 Object.assign(form, rowData)
+            } else {
+                // 新增时，重置表单为初始值
+                Object.keys(form).forEach(key => {
+                    if (key === 'active') {
+                        form[key] = 1; // 默认生效
+                    } else if (key === 'age') {
+                        form[key] = 18; // 默认年龄
+                    } else {
+                        form[key] = '';
+                    }
+                });
             }
         }) 
     }
@@ -177,6 +216,17 @@
         </el-table-column>
     </el-table>
 
+    <div class="pagination-info">
+        <el-pagination
+            v-model:current-page="menuListData.pageNum"
+            :page-size="menuListData.pageSize"
+            :background="false"
+            layout="total, prev, pager, next"
+            :total="tableData.total"
+            @current-change="handleCurrentChange"
+        />
+    </div>
+
 
     <el-dialog 
         v-model="dialogFormVisable"
@@ -198,12 +248,14 @@
                 <el-input v-model="form.name" placeholder="请输入昵称"/>
             </el-form-item>
             <el-form-item label="头像" prop="avatar">
-                <el-button v-if="!form.avatar" type="primary" @click="dialogImgVisable = true">点击上传</el-button>
-                <el-image 
-                    v-else
-                    :src="form.avatar"
-                    style="width: 100px; height: 100px;"
-                />
+                <el-upload
+                    class="avatar-uploader"
+                    :show-file-list="false"
+                    :http-request="uploadAvatar"
+                >
+                    <img v-if="form.avatar" :src="form.avatar" class="avatar" />
+                    <el-button v-else type="primary">点击上传</el-button>
+                </el-upload>
             </el-form-item>
             <el-form-item lebel="性别" prop="sex">
                 <el-select v-model="form.sex" placeholder="请选择性别">
@@ -233,7 +285,6 @@
 
     <el-dialog 
         v-model="dialogImgVisable"
-        :before-close="beforeClose"
         title="选择图片"
         width="680px"
     >
@@ -261,6 +312,13 @@
     .btns {
         padding: 10px 0 10px 10px;
         background-color: #fff;
+    }
+
+    .avatar {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;   /* 关键：裁剪不变形 */
+        border-radius: 6px;
     }
 
     .image-list {
